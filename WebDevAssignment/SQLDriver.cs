@@ -4,8 +4,8 @@ using System.Text;
 
 namespace WebDevAssignment
 {
-    class SQLConnection
+    class SQLDriver
     {
-         
+         private  startConnection
     }
 }
