@@ -6,7 +6,7 @@ namespace WebDevAssignment.View
 {
     class CustomerMenuDriver
     {
-        private static void CustomerMenu()
+        public void OpenMenu()
         {
 
             Boolean quit = false;

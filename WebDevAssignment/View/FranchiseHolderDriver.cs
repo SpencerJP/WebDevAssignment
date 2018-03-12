@@ -7,7 +7,7 @@ namespace WebDevAssignment.View
     class FranchiseHolderDriver
     {
 
-        private static void FranchiseHolderMenu()
+        public void OpenMenu()
         {
 
             Boolean quit = false;

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Text;
 
-namespace WebDevAssignment
+namespace WebDevAssignment.View
 {
     class OwnerMenuDriver
     {
-        public static void OwnerMenu()
+        public void OpenMenu()
         {
 
             Boolean quit = false;
@@ -51,9 +52,20 @@ namespace WebDevAssignment
                     }
                 }
             }
+        }
 
+        private void DisplayStockRequests()
+        {
+            Console.Write("Stock Requests\n\n");
+            try
+            {
 
-
+            }
+            catch(SqlException e)
+            {
+                Console.WriteLine("Something went wrong while fetching data from the SQL Server.");
+                Console.WriteLine(e.ErrorCode);
+            }
         }
     }
 }

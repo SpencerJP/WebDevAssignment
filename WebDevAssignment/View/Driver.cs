@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WebDevAssignment
+namespace WebDevAssignment.View
 {
     class Driver
     {
@@ -51,26 +51,25 @@ namespace WebDevAssignment
             }
 
         }
-
-        // TODO make non-static
+        
         private static void OpenNextMenu(string input)
         {
             if (input == "1") // Owner
             {
-                Console.WriteLine("Owner");
+                OwnerMenuDriver OwnerMenu = new OwnerMenuDriver();
+                OwnerMenu.OpenMenu();
             }
             else if (input == "2") // Franchise Holder
             {
-                Console.WriteLine("Franchise Holder");
+                FranchiseHolderDriver FranchiseOwnerMenu = new FranchiseHolderDriver();
+                FranchiseOwnerMenu.OpenMenu();
             }
             else //( input must be "3" ) // Customer
             {
-                Console.WriteLine("Customer");
+                CustomerMenuDriver CustomerMenu = new CustomerMenuDriver();
+                CustomerMenu.OpenMenu();
             }
         }
 
-        
-
-        
     }
 }
