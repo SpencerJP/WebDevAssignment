@@ -7,6 +7,12 @@ namespace WebDevAssignment.View
 {
     class OwnerMenuDriver
     {
+        private Controller.Controller c;
+        public OwnerMenuDriver(Controller.Controller controller)
+        {
+            c = controller;
+        }
+
         public void OpenMenu()
         {
 
@@ -28,13 +34,13 @@ namespace WebDevAssignment.View
                     switch (input)
                     {
                         case "1":
-                            //DisplayStockRequests();
+                            DisplayStockRequests();
                             break;
                         case "2":
-                            //DisplayOwnerInventory();
+                            DisplayOwnerInventory();
                             break;
                         case "3":
-                            //ResetInventoryItemStock();
+                            ResetInventoryStock();
                             break;
                         case "4":
                             quit = true;
@@ -56,15 +62,33 @@ namespace WebDevAssignment.View
 
         private void DisplayStockRequests()
         {
+            var data = c.GetStockRequests();
             Console.Write("Stock Requests\n\n");
-            try
-            {
+            
+            
+        }
 
-            }
-            catch(SqlException e)
+        private void DisplayOwnerInventory()
+        {
+            var data = c.GetOwnerInventory();
+
+        }
+
+        private void ResetInventoryStock()
+        {
+            Boolean success = false;
+            int id;
+            var data = c.DisplayStock();
+            while(!success)
             {
-                Console.WriteLine("Something went wrong while fetching data from the SQL Server.");
-                Console.WriteLine(e.ErrorCode);
+                var s = Console.ReadLine();
+                if (Int32.TryParse(s, out id))
+                {   
+                    success = c.ResetInventoryStock(id);
+                } else if(s == "quit")
+                {
+                    success = true;
+                }
             }
         }
     }

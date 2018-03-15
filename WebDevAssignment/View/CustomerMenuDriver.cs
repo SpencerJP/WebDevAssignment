@@ -6,8 +6,17 @@ namespace WebDevAssignment.View
 {
     class CustomerMenuDriver
     {
+
+        private Controller.Controller c;
+        public CustomerMenuDriver(Controller.Controller controller)
+        {
+            c = controller;
+        }
+
         public void OpenMenu()
         {
+
+
 
             Boolean quit = false;
             while (!quit)
@@ -25,7 +34,7 @@ namespace WebDevAssignment.View
                     switch (input)
                     {
                         case "1":
-                            //DisplayProducts();
+                            DisplayProducts();
                             break;
                         case "2":
                             quit = true;
@@ -43,5 +52,28 @@ namespace WebDevAssignment.View
                     }
                 }
             }
+
+
         }
+
+        private void DisplayProducts()
+        {
+            Boolean success = false;
+            var data = c.GetProducts();
+            while (!success)
+            {
+                var s = Console.ReadLine();
+                if (Int32.TryParse(s, out int id))
+                {
+                    success = c.BuyProduct(id);
+                }
+                else if (s == "" || s == "\n")
+                {
+                    success = true;
+                }
+            }
+
+        }
+    }
 }
+

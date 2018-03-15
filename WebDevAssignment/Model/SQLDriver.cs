@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Data.SqlClient;
+using System.Data;
 
-namespace WebDevAssignment
+namespace WebDevAssignment.Model
 {
     class SQLDriver
     {
@@ -14,17 +15,35 @@ namespace WebDevAssignment
         private string Password = "abc123";
         private string connectionString;
 
-        public SQLDriver()
+        private Controller.Controller c;
+
+        public SQLDriver(Controller.Controller controller)
         {
             connectionString = "Data Source=" + ServerAddress +
                 ";Initial Catalog=" + Database + ";User ID=" + Username + 
                 ";Password=" + Password;
+            c = controller;
         }
+       
 
-         private void startConnection()
+        public object GetStockRequests()
         {
-            cnn = new SqlConnection(connectionString);
-            cnn.Open();
+            using (cnn = new SqlConnection(connectionString))
+            {
+                cnn.Open();
+
+                var command = cnn.CreateCommand();
+                command.CommandText = @"SELECT StockRequest.StockRequestID, Store.Name, Product.Name, StockRequest.Quantity, StoreInventory.StockLevel
+                                        FROM StockRequest
+                                        JOIN Store ON StockRequest.StoreID = Store.StoreID
+                                        JOIN Product ON StockRequest.ProductID = Product.ProductID
+                                        JOIN StoreInventory ON(StoreInventory.StoreID = StockRequest.StoreID AND StockRequest.ProductID = StoreInventory.ProductID); ";
+
+                var table = new DataTable();
+                new SqlDataAdapter(command).Fill(table);
+                
+            }
+            
         }
 
         public void testRead()
@@ -46,5 +65,7 @@ namespace WebDevAssignment
                 Console.WriteLine(e.ToString());
             }
         }
+
+        public void 
     }
 }
