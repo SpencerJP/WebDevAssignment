@@ -63,7 +63,14 @@ namespace WebDevAssignment.View
         private void DisplayStockRequests()
         {
             var data = c.GetStockRequests();
-            Console.Write("Stock Requests\n\n");
+            Console.WriteLine(@"                       Stock Requests
+
+                               ID    Store                   Product                Quantity   Current Stock     Stock Availability");
+            foreach(var x in data)
+            {
+                var stockavailability = Int32.Parse(x[3]) > Int32.Parse(x[4]);
+                String.Format("{0,-6} | {1,-25) | {2,-22} | {3,-11} | {4,-18} | {5,-18} ", x[0], x[1], x[2], x[3], x[4], stockavailability);
+            }
             
             
         }

@@ -1,39 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Data.SqlClient;
 using System.Data;
 
 namespace WebDevAssignment.Model
 {
+
+    
+    
+    
+
     class SQLDriver
     {
+        public const string ServerAddress = "wdt2018.australiaeast.cloudapp.azure.com";
+        public const string Database = "s3539519";
+        public const string Username = "s3539519";
+        public const string Password = "abc123";
+
         private SqlConnection cnn;
-        private string ServerAddress = "wdt2018.australiaeast.cloudapp.azure.com";
-        private string Database = "s3539519";
-        private string Username = "s3539519";
-        private string Password = "abc123";
         private string connectionString;
 
-        private Controller.Controller c;
-
-        public SQLDriver(Controller.Controller controller)
+        public SQLDriver()
         {
+
+         
             connectionString = "Data Source=" + ServerAddress +
                 ";Initial Catalog=" + Database + ";User ID=" + Username + 
                 ";Password=" + Password;
-            c = controller;
+
         }
        
 
-        public object GetStockRequests()
+        public DataTable GetStockRequests()
         {
             using (cnn = new SqlConnection(connectionString))
             {
                 cnn.Open();
 
                 var command = cnn.CreateCommand();
-                command.CommandText = @"SELECT StockRequest.StockRequestID, Store.Name, Product.Name, StockRequest.Quantity, StoreInventory.StockLevel
+                command.CommandText = @"SELECT StockRequest.StockRequestID as ID, Store.Name as Store, Product.Name as Product, StockRequest.Quantity as Quantity, StoreInventory.StockLevel as StockLevel
                                         FROM StockRequest
                                         JOIN Store ON StockRequest.StoreID = Store.StoreID
                                         JOIN Product ON StockRequest.ProductID = Product.ProductID
@@ -41,31 +45,10 @@ namespace WebDevAssignment.Model
 
                 var table = new DataTable();
                 new SqlDataAdapter(command).Fill(table);
-                
+                return table;
             }
+            throw new Exception("Error while fetching data.");
             
         }
-
-        public void testRead()
-        {
-            try
-            {
-                this.startConnection();
-                SqlDataReader myReader = null;
-                SqlCommand myCommand = new SqlCommand("select * from Product", cnn);
-                myReader = myCommand.ExecuteReader();
-                while (myReader.Read())
-                {
-                    Console.WriteLine(myReader["ProductID"].ToString());
-                    Console.WriteLine(myReader["Name"].ToString());
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-        }
-
-        public void 
     }
 }

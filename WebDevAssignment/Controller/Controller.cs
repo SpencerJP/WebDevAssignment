@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using WebDevAssignment.View;
+using WebDevAssignment.Model;
 
 namespace WebDevAssignment.Controller
 {
     class Controller
     {
-        private Model.SQLDriver sqldriver;
-        private View.MainMenu mainmenu;
 
         public Controller()
         {
-
-            Model.SQLDriver sqldriver = new Model.SQLDriver(this);
-            View.MainMenu mainmenu = new View.MainMenu(this);
-
+            MainMenu MainMenu = new MainMenu(this);
         }
 
         public bool ResetInventoryStock(int id)
@@ -32,13 +29,18 @@ namespace WebDevAssignment.Controller
             throw new NotImplementedException();
         }
 
-        public object GetStockRequests()
+        public List<List<string>> GetStockRequests()
         {
 
-            /* */
-            var data = sqldriver.GetStockRequests();
+            SQLDriver SQL = new SQLDriver();
+            var content = new List<List<string>>();
+            var data = SQL.GetStockRequests();
 
-            throw new NotImplementedException();
+            foreach (var x in data.Select())
+            {
+                content.Add(new List<string> { (string)x["ID"], (string)x["Store"], (string)x["Product"], (string)x["Quantity"], (string)x["StockLevel"] });
+            }
+            return content;
 
         }
 
@@ -48,6 +50,11 @@ namespace WebDevAssignment.Controller
         }
 
         internal bool BuyProduct(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal object GetInventory()
         {
             throw new NotImplementedException();
         }

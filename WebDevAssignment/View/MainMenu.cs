@@ -10,9 +10,10 @@ namespace WebDevAssignment.View
         public MainMenu(Controller.Controller controller)
         {
             c = controller;
+            this.OpenMenu();
         }
 
-        public MainMenu()
+        public void OpenMenu()
         {
             Boolean quit = false;
             Console.Write("Welcome to Marvelous Magic\n" +
