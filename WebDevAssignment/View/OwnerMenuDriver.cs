@@ -63,33 +63,57 @@ namespace WebDevAssignment.View
         private void DisplayStockRequests()
         {
             var data = c.GetStockRequests();
-            Console.WriteLine(@"                       Stock Requests
+            Boolean success = false;
+            Console.WriteLine(@"                 
+                                            Stock Requests
 
-                               ID    Store                   Product                Quantity   Current Stock     Stock Availability");
+ID       Store                       Product                  Quantity      Current Stock        Stock Availability");
             foreach(var x in data)
             {
-                var stockavailability = Int32.Parse(x[3]) > Int32.Parse(x[4]);
-                String.Format("{0,-6} | {1,-25) | {2,-22} | {3,-11} | {4,-18} | {5,-18} ", x[0], x[1], x[2], x[3], x[4], stockavailability);
+                var stockavailability = Convert.ToString(Int32.Parse(x[3]) > Int32.Parse(x[4]));
+                Console.WriteLine(String.Format("{0,-6} | {1,-25} | {2,-22} | {3,-11} | {4,-18} | {5,-18} ", x[0], x[1], x[2], x[3], x[4], stockavailability));
             }
-            
-            
+            Console.Write(@"
+Enter request to process:");
+            while (!success)
+            {
+                var s = Console.ReadLine();
+                if (Int32.TryParse(s, out int id))
+                {
+                    success = c.ProcessStockRequest(id);
+                    Console.WriteLine(success ? "The operation was successful, the stock request has been processed and removed." : "The operation was a failure, you don't have enough stock.");
+                }
+                else if(s == "" || s == "\n");
+                {
+                    success = true;
+                }
+            }
+
+
         }
 
         private void DisplayOwnerInventory()
         {
             var data = c.GetOwnerInventory();
+            Console.Write(@"
+                              Owner Inventory
+ID    Product                   Current Stock");
+            foreach (var x in data)
+            {
+                Console.WriteLine(String.Format("{0,-7} | {1,-26} | {2,-13}", x[0], x[1], x[2]));
+            }
+
 
         }
 
         private void ResetInventoryStock()
         {
             Boolean success = false;
-            int id;
             var data = c.DisplayStock();
-            while(!success)
+            while (!success)
             {
                 var s = Console.ReadLine();
-                if (Int32.TryParse(s, out id))
+                if (Int32.TryParse(s, out int id))
                 {   
                     success = c.ResetInventoryStock(id);
                 } else if(s == "quit")

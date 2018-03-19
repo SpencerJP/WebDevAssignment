@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using WebDevAssignment.View;
 using WebDevAssignment.Model;
+using System.Data.SqlClient;
+using System.Data;
 
 namespace WebDevAssignment.Controller
 {
@@ -24,21 +26,29 @@ namespace WebDevAssignment.Controller
             throw new NotImplementedException();
         }
 
-        public object GetOwnerInventory()
+        public List<List<string>> GetOwnerInventory()
         {
-            throw new NotImplementedException();
+            var sql = new SQLDriver();
+            var content = new List<List<string>>();
+            var data = sql.GetOwnerInventory();
+            foreach (var x in data.Select())
+            {
+                content.Add(new List<string> { x["ID"].ToString(), x["Product"].ToString(), x["StockLevel"].ToString()});
+            }
+            return content;
+
         }
 
         public List<List<string>> GetStockRequests()
         {
 
-            SQLDriver SQL = new SQLDriver();
+            var sql = new SQLDriver();
             var content = new List<List<string>>();
-            var data = SQL.GetStockRequests();
+            var data = sql.GetStockRequests();
 
             foreach (var x in data.Select())
             {
-                content.Add(new List<string> { (string)x["ID"], (string)x["Store"], (string)x["Product"], (string)x["Quantity"], (string)x["StockLevel"] });
+                content.Add(new List<string> { x["ID"].ToString(), x["Store"].ToString(), x["Product"].ToString(), x["Quantity"].ToString(), x["StockLevel"].ToString() });
             }
             return content;
 
@@ -49,14 +59,22 @@ namespace WebDevAssignment.Controller
             throw new NotImplementedException();
         }
 
-        internal bool BuyProduct(int id)
+        public bool BuyProduct(int id)
         {
             throw new NotImplementedException();
         }
 
-        internal object GetInventory()
+        public object GetInventory()
         {
             throw new NotImplementedException();
+        }
+
+        public bool ProcessStockRequest(int id)
+        {
+            var sql = new SQLDriver();
+
+            var success = sql.GetAndUpdateSpecificStockRequest(id);
+            return success;
         }
     }
 }
