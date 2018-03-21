@@ -97,14 +97,14 @@ ID       Store                       Product                  Quantity      Curr
         private void DisplayOwnerInventory()
         {
             var data = c.GetOwnerInventory();
-            Console.Write(@"
+            Console.WriteLine(@"
                               Owner Inventory
 ID    Product                   Current Stock");
             foreach (var x in data)
             {
                 Console.WriteLine(String.Format("{0,-7} | {1,-26} | {2,-13}", x[0], x[1], x[2]));
             }
-
+            Console.WriteLine();
 
         }
 
