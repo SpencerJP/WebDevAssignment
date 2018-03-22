@@ -84,9 +84,12 @@ ID       Store                       Product                  Quantity      Curr
                     success = c.ProcessStockRequest(id);
                     Console.WriteLine(success ? "The operation was successful, the stock request has been processed and removed." : "The operation was a failure, you don't have enough stock, or you inserted an invalid ID.");
                 }
-                else if(s == "" || s == "\n");
+                else 
                 {
-                    Console.WriteLine("you inserted an invalid ID.");
+                    if (!(s == "" || s == "\n"))
+                    {
+                        Console.WriteLine("you inserted an invalid ID.");
+                    }
                     success = true;
                 }
             }
@@ -111,7 +114,7 @@ ID    Product                   Current Stock");
         private void ResetInventoryStock()
         {
             Boolean success = false;
-            var data = c.DisplayStock();
+            var data = c.GetOwnerInventory();
             while (!success)
             {
                 var s = Console.ReadLine();

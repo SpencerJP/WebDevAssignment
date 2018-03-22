@@ -5,7 +5,7 @@ using System.Data;
 namespace WebDevAssignment.Model
 {
 
-    class SQLDriver
+    class SQLController
     {
         public const string ServerAddress = "wdt2018.australiaeast.cloudapp.azure.com";
         public const string Database = "s3539519";
@@ -15,25 +15,21 @@ namespace WebDevAssignment.Model
         private string connectionString;
         private SqlConnection cnn;
 
-        public SQLDriver()
+        public SQLController()
         {
-                connectionString = "Data Source=" + SQLDriver.ServerAddress +
-                ";Initial Catalog=" + SQLDriver.Database + ";User ID=" + SQLDriver.Username +
-                ";Password=" + SQLDriver.Password;
+                connectionString = "Data Source=" + SQLController.ServerAddress +
+                ";Initial Catalog=" + SQLController.Database + ";User ID=" + SQLController.Username +
+                ";Password=" + SQLController.Password;
         }
 
-        public DataTable GetStockRequests()
+        public DataTable ExecuteDataRequestReturnTable(string commandString)
         {
             using (cnn = new SqlConnection(connectionString))
             {
                 cnn.Open();
 
                 var command = cnn.CreateCommand();
-                command.CommandText = @"SELECT StockRequest.StockRequestID as ID, Store.Name as Store, Product.Name as Product, StockRequest.Quantity as Quantity, OwnerInventory.StockLevel as StockLevel
-                                        FROM StockRequest
-                                        JOIN Store ON StockRequest.StoreID = Store.StoreID
-                                        JOIN Product ON StockRequest.ProductID = Product.ProductID
-                                        JOIN OwnerInventory ON StockRequest.ProductID = OwnerInventory.ProductID; ";
+                command.CommandText = commandString;
 
                 var table = new DataTable();
                 new SqlDataAdapter(command).Fill(table);
@@ -42,20 +38,28 @@ namespace WebDevAssignment.Model
             throw new Exception("Error while fetching data.");
         }
 
-        public DataTable GetOwnerInventory()
+        public SqlDataReader ExecuteDataRequestReturnReader(string commandString)
         {
             using (cnn = new SqlConnection(connectionString))
             {
                 cnn.Open();
 
                 var command = cnn.CreateCommand();
-                command.CommandText = @"SELECT OwnerInventory.ProductID as ID, Product.Name as Product, OwnerInventory.StockLevel
-                                        FROM OwnerInventory
-                                        JOIN Product ON Product.ProductID = OwnerInventory.ProductID";
+                command.CommandText = commandString;
+                return command.ExecuteReader();
+            }
+            throw new Exception("Error while fetching data.");
+        }
 
-                var table = new DataTable();
-                new SqlDataAdapter(command).Fill(table);
-                return table;
+        public int ExecuteNonQueryRequest(string commandString)
+        {
+            using (cnn = new SqlConnection(connectionString))
+            {
+                cnn.Open();
+                var command = new SqlCommand();
+                command.CommandText = commandString;
+
+                return command.ExecuteNonQuery();
             }
             throw new Exception("Error while fetching data.");
         }
@@ -91,25 +95,20 @@ namespace WebDevAssignment.Model
                         var newOwnerStock = (int)stocklevel - (int)quantity;
 
                         // Updates the "Description" field in the "Status" table.
-                        command.CommandText = $@"UPDATE OwnerInventory
+                        ExecuteNonQueryRequest($@"UPDATE OwnerInventory
                                                        SET OwnerInventory.StockLevel = OwnerInventory.StockLevel - {quantity}
                                                        WHERE OwnerInventory.ProductID = {productID}
-                                                       ";
-
-                        var updates = command.ExecuteNonQuery();
-                        command.CommandText = $@"IF EXISTS (SELECT * FROM StoreInventory 
+                                                       ");
+                        
+                        ExecuteNonQueryRequest($@"IF EXISTS (SELECT * FROM StoreInventory 
                                                             WHERE (StoreInventory.ProductID = {productID} AND StoreInventory.StoreID = {storeID}) )
                                                      UPDATE StoreInventory 
                                                      SET StoreInventory.StockLevel = StoreInventory.StockLevel + {quantity}
                                                      WHERE (StoreInventory.ProductID = {productID} AND StoreInventory.StoreID = {storeID})
                                                  ELSE
-                                                     INSERT INTO StoreInventory VALUES({storeID}, {productID}, {quantity})
-                                                       ";
-                        updates = command.ExecuteNonQuery();
-
-                        command.CommandText = $@"DELETE FROM StockRequest
-                                                 WHERE StockRequest.StockRequestID = {stockrequestID}";
-                        updates = command.ExecuteNonQuery();
+                                                     INSERT INTO StoreInventory VALUES({storeID}, {productID}, {quantity})");
+                        ExecuteNonQueryRequest($@"DELETE FROM StockRequest
+                                                 WHERE StockRequest.StockRequestID = {stockrequestID}");
 
                         return true;
                     }
