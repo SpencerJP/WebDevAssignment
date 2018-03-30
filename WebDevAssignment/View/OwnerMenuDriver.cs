@@ -113,17 +113,46 @@ ID    Product                   Current Stock");
 
         private void ResetInventoryStock()
         {
-            Boolean success = false;
-            var data = c.GetOwnerInventory();
-            while (!success)
+            DisplayOwnerInventory();
+            Console.Write("Insert an ID to reset: ");
+            while(true)
             {
                 var s = Console.ReadLine();
                 if (Int32.TryParse(s, out int id))
                 {   
-                    success = c.ResetInventoryStock(id);
-                } else if(s == "quit")
+                    var success = c.ResetInventoryStock(id);
+                    if (success)
+                    {
+                        try
+                        {
+                            Console.WriteLine(c.GetProductNameByID(id) + " has been set to 20.");
+                        }
+                        catch (Exception)
+                        {
+                            Console.WriteLine("This should never happen ever so this is a disaster");
+                        }
+                           
+                        
+                    }
+                    else
+                    {   
+                        try
+                        {
+                            Console.WriteLine(c.GetProductNameByID(id) + " has a stock higher than 20, so it has not been reset.");
+                        }
+                        catch(Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                    }
+                    break;
+                } else
                 {
-                    success = true;
+                    if (!(s == "" || s == "\n"))
+                    {
+                        Console.WriteLine("you inserted an invalid ID.");
+                    }
+                    break;
                 }
             }
         }

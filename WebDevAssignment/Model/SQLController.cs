@@ -56,7 +56,7 @@ namespace WebDevAssignment.Model
             using (cnn = new SqlConnection(connectionString))
             {
                 cnn.Open();
-                var command = new SqlCommand();
+                var command = cnn.CreateCommand();
                 command.CommandText = commandString;
 
                 return command.ExecuteNonQuery();

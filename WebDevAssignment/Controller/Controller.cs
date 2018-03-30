@@ -19,6 +19,18 @@ namespace WebDevAssignment.Controller
         public bool ResetInventoryStock(int id)
         {
             var sql = new SQLController();
+            var content = new List<List<string>>();
+            var linesAffected = sql.ExecuteNonQueryRequest($@"UPDATE OwnerInventory
+                                          SET StockLevel = 20
+                                          WHERE ProductID = {id} AND StockLevel < 20"); // safe because it is an int
+            if (linesAffected == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 
         }
 
@@ -36,6 +48,19 @@ namespace WebDevAssignment.Controller
             }
             return content;
 
+        }
+
+        public string GetProductNameByID(int id)
+        {
+            var sql = new SQLController();
+            var data = sql.ExecuteDataRequestReturnTable($@"SELECT * FROM Product
+                                                           WHERE ProductID = {id}");
+            foreach(var x in data.Select())
+            {
+                Console.WriteLine(x["Name"].ToString());
+                return x["Name"].ToString();
+            }
+            throw new Exception($"A product of the ID {id} does not exist!");
         }
 
         public List<List<string>> GetStockRequests()
@@ -77,31 +102,40 @@ namespace WebDevAssignment.Controller
         public bool ProcessStockRequest(int id)
         {
             var sql = new SQLController();
+            int quantity = -1, stocklevel = -1, productID = -1, storeID = -1, stockrequestID = -1;
 
-            using (var reader = sql.ExecuteDataRequestReturnReader($@"SELECT StockRequest.StockRequestID as ID, Store.StoreID as StoreID, Product.ProductID as ProductID, StockRequest.Quantity as Quantity, OwnerInventory.StockLevel as StockLevel
+            using (var data = sql.ExecuteDataRequestReturnTable($@"SELECT StockRequest.StockRequestID as ID, Store.StoreID as StoreID, Product.ProductID as ProductID, StockRequest.Quantity as Quantity, OwnerInventory.StockLevel as StockLevel
                                         FROM StockRequest
                                         JOIN Store ON StockRequest.StoreID = Store.StoreID
                                         JOIN Product ON StockRequest.ProductID = Product.ProductID
                                         JOIN OwnerInventory ON StockRequest.ProductID = OwnerInventory.ProductID
-                                        WHERE StockRequestID = {id}; ")) 
+                                        WHERE StockRequestID = {id}; ")) // safe because it has to be an int
             {
 
                 try
                 {
-                    reader.Read();
-                    var quantity = reader["Quantity"];
-                    var stocklevel = reader["StockLevel"];
-                    var productID = reader["ProductID"];
-                    var stockrequestID = reader["ID"];
-                    var storeID = reader["StoreID"];
-                    reader.Close();
-                    if ((int)quantity > (int)stocklevel) // not enough stock
+                    if (data.Rows.Count > 0)
+                    {
+                        DataRow row = data.Rows[0];
+
+                        quantity = (int) row["Quantity"];
+                        stocklevel = (int) row["StockLevel"];
+                        productID = (int) row["ProductID"];
+                        stockrequestID = (int)row["ID"];
+                        storeID = (int) row["StoreID"];
+
+                    }
+                    if (quantity == -1)
+                    {
+                        throw new Exception("Something went wrong when reading the data from SQL.");
+                    }
+                    if (quantity > stocklevel) // not enough stock
                     {
                         return false;
                     }
                     var newOwnerStock = (int)stocklevel - (int)quantity;
 
-                    // Updates the "Description" field in the "Status" table.
+                   
                     sql.ExecuteNonQueryRequest($@"UPDATE OwnerInventory
                                                        SET OwnerInventory.StockLevel = OwnerInventory.StockLevel - {quantity}
                                                        WHERE OwnerInventory.ProductID = {productID}
