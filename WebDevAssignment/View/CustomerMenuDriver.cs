@@ -8,12 +8,56 @@ namespace WebDevAssignment.View
     {
 
         private Controller.Controller c;
+        private int currentStoreID;
+
         public CustomerMenuDriver(Controller.Controller controller)
         {
             c = controller;
         }
 
-        public void OpenMenu()
+        public void SelectStore()
+        {
+            Console.Write("\nStores\n");
+            var data = c.GetStores();
+            foreach (var x in data)
+            {
+                Console.WriteLine(String.Format("{0,-7} | {1,-26}", x[0], x[1]));
+            }
+            while (true)
+            {
+                Console.Write("Enter the store to use: ");
+                var s = Console.ReadLine();
+                if (Int32.TryParse(s, out int id))
+                {
+                    try
+                    {
+
+                        var StoreName = c.SelectStore(id);
+                        currentStoreID = id;
+                        OpenMenu(StoreName);
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+
+                }
+                else
+                {
+                    if (!(s == "" || s == "\n"))
+                    {
+                        Console.WriteLine("You inserted an invalid ID.");
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void OpenMenu(String StoreName)
         {
 
 
@@ -24,7 +68,7 @@ namespace WebDevAssignment.View
                 while (true)
                 {
 
-                    Console.Write("Welcome to Marvelous Magic (Retail    - {{STORE NAME}})\n" +
+                    Console.Write($"Welcome to Marvelous Magic (Retail    - { StoreName })\n" +
                     "+++++++++++++++++++++++++++++++++++\n" +
                     "1. Display Products\n" +
                     "2. Return to Main Menu\n" +
@@ -59,20 +103,87 @@ namespace WebDevAssignment.View
         private void DisplayProducts()
         {
             Boolean success = false;
-            var data = c.GetProducts();
+            int currentpage = 0;
+            
+            var data = c.GetStoreInventory(currentStoreID);
+            int length = data.Count;
+            int endOfPage;
+
             while (!success)
             {
-                var s = Console.ReadLine();
-                if (Int32.TryParse(s, out int id))
+                endOfPage = (currentpage*3) + 3;
+                Console.WriteLine(@"Inventory
+ID    Product                   Current Stock");
+                for (int i = 0 + (currentpage * 3); (i < endOfPage) && (i != length); i++)
                 {
-                    success = c.BuyProduct(id);
+                    if (i > length)
+                    {
+                        break;
+
+                    }
+                    else
+                    {
+                        Console.WriteLine(String.Format("{0,-7} | {1,-26} | {2,-13}", data[i][0], data[i][1], data[i][2]));
+                    }
+                }
+                Console.Write(@"[Legend: 'N' Next Page | 'R' Return To Menu]
+
+Enter product ID to purchase or function: ");
+                var s = Console.ReadLine();
+                switch(s)
+                {
+                    case "N":
+                        if (currentpage != (length / 3))
+                        {
+                            currentpage++;
+                        }
+                        else
+                        {
+                            currentpage = 0;
+                        }
+                        break;
+                    case "R":
+                        success = true;
+                        break;
+                    default:
+                        Purchase(s);
+                        break;
+                }
+
+
+                    
+            }
+
+        }
+
+
+        private void Purchase(String s)
+        {
+            if (Int32.TryParse(s, out int id))
+            {
+                Console.Write(@"
+Enter quantity to purchase: ");
+                s = Console.ReadLine();
+                if (Int32.TryParse(s, out int quantity))
+                {
+                    try
+                    { 
+                        c.BuyProduct(currentStoreID, id, quantity);
+                    }
+                    catch(Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
                 }
                 else if (s == "" || s == "\n")
                 {
-                    success = true;
+                    return;
                 }
             }
-
+            else if (s == "" || s == "\n")
+            {
+                return;
+            }
         }
     }
 }

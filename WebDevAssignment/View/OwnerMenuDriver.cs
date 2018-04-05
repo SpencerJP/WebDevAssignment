@@ -131,8 +131,7 @@ ID    Product                   Current Stock");
                         {
                             Console.WriteLine("This should never happen ever so this is a disaster");
                         }
-                           
-                        
+                                                   
                     }
                     else
                     {   

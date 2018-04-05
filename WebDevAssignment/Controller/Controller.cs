@@ -19,7 +19,6 @@ namespace WebDevAssignment.Controller
         public bool ResetInventoryStock(int id)
         {
             var sql = new SQLController();
-            var content = new List<List<string>>();
             var linesAffected = sql.ExecuteNonQueryRequest($@"UPDATE OwnerInventory
                                           SET StockLevel = 20
                                           WHERE ProductID = {id} AND StockLevel < 20"); // safe because it is an int
@@ -34,6 +33,29 @@ namespace WebDevAssignment.Controller
 
         }
 
+        public String SelectStore(int id)
+        {
+            var sql = new SQLController();
+            var data = sql.ExecuteDataRequestReturnTable($"SELECT Name FROM Store WHERE StoreID={id}");
+            if (data.Rows.Count > 0)
+            {
+                DataRow row = data.Rows[0];
+                return row["Name"].ToString();
+            }
+            throw new Exception("Not a valid ID.");
+        }
+
+        public List<List<String>> GetStores()
+        {
+            var sql = new SQLController();
+            var content = new List<List<string>>();
+            var data = sql.ExecuteDataRequestReturnTable(@"SELECT * FROM Store");
+            foreach (var x in data.Select())
+            {
+                content.Add(new List<string> { x["StoreID"].ToString(), x["Name"].ToString() });
+            }
+            return content;
+        }
 
         public List<List<string>> GetOwnerInventory()
         {
@@ -50,6 +72,21 @@ namespace WebDevAssignment.Controller
 
         }
 
+        public List<List<String>> GetStoreInventory(int id)
+        {
+            var sql = new SQLController();
+            var content = new List<List<string>>();
+            var data = sql.ExecuteDataRequestReturnTable($@"SELECT StoreInventory.StoreID, StoreInventory.ProductID as ID, Product.Name as Product, StoreInventory.StockLevel as StockLevel
+                                        FROM StoreInventory
+                                        JOIN Product ON Product.ProductID = StoreInventory.ProductID
+                                        WHERE StoreInventory.StoreID = {id}");
+            foreach (var x in data.Select())
+            {
+                content.Add(new List<string> { x["ID"].ToString(), x["Product"].ToString(), x["StockLevel"].ToString() });
+            }
+            return content;
+        }
+
         public string GetProductNameByID(int id)
         {
             var sql = new SQLController();
@@ -57,15 +94,34 @@ namespace WebDevAssignment.Controller
                                                            WHERE ProductID = {id}");
             foreach(var x in data.Select())
             {
-                Console.WriteLine(x["Name"].ToString());
                 return x["Name"].ToString();
             }
             throw new Exception($"A product of the ID {id} does not exist!");
         }
 
+        public List<List<String>> GetStockBelowThreshold(int id, int threshold)
+        {
+            var sql = new SQLController();
+            var content = new List<List<string>>();
+            var data = sql.ExecuteDataRequestReturnTable($@"SELECT StoreInventory.StoreID, StoreInventory.ProductID as ID, Product.Name as Product, StoreInventory.StockLevel as StockLevel
+                                        FROM StoreInventory
+                                        JOIN Product ON Product.ProductID = StoreInventory.ProductID
+                                        WHERE StoreInventory.StoreID = {id} AND StockLevel < { threshold }");
+            int i = 0;
+            foreach (var x in data.Select())
+            {
+                content.Add(new List<string> { x["ID"].ToString(), x["Product"].ToString(), x["StockLevel"].ToString() });
+                i++;
+            }
+            if (i < 1)
+            {
+                throw new Exception("No products are below the threshold.");
+            }
+            return content;
+        }
+
         public List<List<string>> GetStockRequests()
         {
-
             var sql = new SQLController();
             var content = new List<List<string>>();
             var data = sql.ExecuteDataRequestReturnTable(@"SELECT StockRequest.StockRequestID as ID, Store.Name as Store, Product.Name as Product, StockRequest.Quantity as Quantity, OwnerInventory.StockLevel as StockLevel
@@ -82,21 +138,64 @@ namespace WebDevAssignment.Controller
 
         }
 
-
-
-        public object GetProducts()
+        public void CreateRequest(int storeID, int productID, int quantity)
         {
-            throw new NotImplementedException();
+            var sql = new SQLController();
+            var content = new List<List<string>>();
+            var rowsAffected = sql.ExecuteNonQueryRequest($@"INSERT INTO StockRequest VALUES({storeID},
+                                                            {productID},
+                                                            {quantity})");
+            if (rowsAffected != 1)
+            {
+                throw new Exception("Invalid product ID.");
+            }
+        }
+        
+        public void AddNewInventoryItem(int storeID, int productID)
+        {
+            var sql = new SQLController();
+            var data = sql.ExecuteDataRequestReturnTable($@" SELECT OwnerInventory.ProductID
+                                                            FROM OwnerInventory
+                                                            WHERE OwnerInventory.ProductID IN
+                                                            (SELECT ProductID
+                                                            FROM Product
+                                                            EXCEPT
+                                                            SELECT ProductID FROM StoreInventory WHERE StoreInventory.StoreID = {storeID})" );
+            foreach (var x in data.Select())
+            {
+                if (productID == (int) x["ProductID"])
+                {
+                    CreateRequest(storeID, productID, 1);
+                    return;
+                }
+            }
+            throw new Exception("Failed to create a stock request - This store already has that item in stock.");
         }
 
-        public bool BuyProduct(int id)
+        public List<List<String>> GetItemsNotInStock(int id)
         {
-            throw new NotImplementedException();
+            var sql = new SQLController();
+            var content = new List<List<string>>();
+
+            var data = sql.ExecuteDataRequestReturnTable($@" SELECT OwnerInventory.ProductID, Product.Name, OwnerInventory.StockLevel
+                                                            FROM OwnerInventory
+                                                            INNER JOIN Product ON OwnerInventory.ProductID = Product.ProductID
+                                                            WHERE OwnerInventory.ProductID IN
+                                                            (SELECT ProductID
+                                                            FROM Product
+                                                            EXCEPT
+                                                            SELECT ProductID FROM StoreInventory WHERE StoreInventory.StoreID = {id}) ");
+
+            foreach (var x in data.Select())
+            {
+                content.Add(new List<string> { x["ProductID"].ToString(), x["Name"].ToString(), x["StockLevel"].ToString() });
+            }
+            return content;
         }
 
-        public object GetInventory()
+        public bool BuyProduct(int store, int id, int quantity)
         {
-            throw new NotImplementedException();
+            
         }
 
         public bool ProcessStockRequest(int id)

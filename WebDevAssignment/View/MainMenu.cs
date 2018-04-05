@@ -16,17 +16,17 @@ namespace WebDevAssignment.View
         public void OpenMenu()
         {
             Boolean quit = false;
-            Console.Write("Welcome to Marvelous Magic\n" +
+            while (!quit)
+            {
+                while (true)
+                {
+                    Console.Write("Welcome to Marvelous Magic\n" +
                     "+++++++++++++++++++++++++++++++++++\n" +
                     "1. Owner\n" +
                     "2. Franchise Holder\n" +
                     "3. Customer\n" +
                     "4. Quit\n" +
                     "Please enter an option: ");
-            while (!quit)
-            {
-                while (true)
-                {
                     string input = Console.ReadLine();
                     switch (input)
                     {
@@ -39,13 +39,13 @@ namespace WebDevAssignment.View
                         case "2":
 
                             FranchiseHolderDriver FranchiseOwnerMenu = new FranchiseHolderDriver(this.c);
-                            FranchiseOwnerMenu.OpenMenu();
+                            FranchiseOwnerMenu.SelectStore();
                             break;
 
                         case "3":
 
                             CustomerMenuDriver CustomerMenu = new CustomerMenuDriver(this.c);
-                            CustomerMenu.OpenMenu();
+                            CustomerMenu.SelectStore();
                             break;
                         case "4":
                             quit = true;
