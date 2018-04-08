@@ -4,6 +4,10 @@ using System.Text;
 
 namespace WebDevAssignment.View
 {
+    /* 
+     * CustomerMenuDriver
+     * Opens a view for the customer menu
+     */ 
     class CustomerMenuDriver
     {
 
@@ -133,12 +137,13 @@ Enter product ID to purchase or function: ");
                 switch(s)
                 {
                     case "N":
+
                         if (currentpage != (length / 3))
                         {
                             currentpage++;
                         }
                         else
-                        {
+                        {// wraps around to the start
                             currentpage = 0;
                         }
                         break;
@@ -147,6 +152,8 @@ Enter product ID to purchase or function: ");
                         break;
                     default:
                         Purchase(s);
+                        // have to force the user out of this menu to update the table
+                        success = true;
                         break;
                 }
 
@@ -167,8 +174,13 @@ Enter quantity to purchase: ");
                 if (Int32.TryParse(s, out int quantity))
                 {
                     try
-                    { 
+                    {
+                        // this will just throw an error if the productID doesn't exist, to give a more accurate error message
+                        var product = c.GetProductNameByID(id); 
+
                         c.BuyProduct(currentStoreID, id, quantity);
+
+                        Console.WriteLine($"You bought {quantity} of {product}!");
                     }
                     catch(Exception e)
                     {

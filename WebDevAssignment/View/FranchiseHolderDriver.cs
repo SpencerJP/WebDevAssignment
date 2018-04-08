@@ -4,6 +4,10 @@ using System.Text;
 
 namespace WebDevAssignment.View
 {
+    /* 
+     * FranchiseHolderDriver
+     * Opens a view for the franchise holder menu
+     */
     class FranchiseHolderDriver
     {
         private Controller.Controller c;
@@ -150,7 +154,7 @@ ID    Product                   Current Stock");
                 {
                     if (!(s == "" || s == "\n"))
                     {
-                        Console.WriteLine("you inserted an invalid ID.");
+                        Console.WriteLine("You inserted an invalid ID.");
                     }
                     else
                     {
@@ -185,7 +189,7 @@ ID    Product                   Current Stock");
                 {
                     if (!(s == "" || s == "\n"))
                     {
-                        Console.WriteLine("you inserted an invalid ID.");
+                        Console.WriteLine("You inserted an invalid ID.");
                     }
                     else
                     {
@@ -198,7 +202,7 @@ ID    Product                   Current Stock");
         private void AddNewInventoryItem()
         {
             var data = c.GetItemsNotInStock(currentStoreID);
-            if (data != null)
+            if (data.Count != 0)
             {
 
                 Console.WriteLine(@"
@@ -231,7 +235,7 @@ ID    Product                   Current Stock");
                     {
                         if (!(s == "" || s == "\n"))
                         {
-                            Console.WriteLine("you inserted an invalid ID.");
+                            Console.WriteLine("You inserted an invalid ID.");
                         }
                         else
                         {
@@ -242,7 +246,7 @@ ID    Product                   Current Stock");
             }
             else
             {
-                Console.Write(@"This store already has all available items in stock.\n");
+                Console.WriteLine(@"This store already has all available items in stock.");
             }
         }
 

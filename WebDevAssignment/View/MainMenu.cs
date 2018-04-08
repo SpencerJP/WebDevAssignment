@@ -4,7 +4,11 @@ using System.Text;
 
 namespace WebDevAssignment.View
 {
-    internal class MainMenu
+    /*
+     *  MainMenu
+     *  Launches a view of the main menu of this app.
+     */
+    class MainMenu
     {
         private Controller.Controller c;
         public MainMenu(Controller.Controller controller)

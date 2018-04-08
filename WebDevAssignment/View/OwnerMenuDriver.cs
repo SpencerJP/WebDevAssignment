@@ -5,6 +5,10 @@ using System.Text;
 
 namespace WebDevAssignment.View
 {
+    /* 
+     * OwnerMenuDriver
+     * Opens a view for the owner menu
+     */
     class OwnerMenuDriver
     {
         private Controller.Controller c;
@@ -71,6 +75,7 @@ namespace WebDevAssignment.View
 ID       Store                       Product                  Quantity      Current Stock        Stock Availability");
             foreach(var x in data)
             {
+                // get a printable boolean of whether quantity is less than current stock
                 var stockavailability = Convert.ToString(Int32.Parse(x[3]) < Int32.Parse(x[4]));
                 Console.WriteLine(String.Format("{0,-6} | {1,-25} | {2,-22} | {3,-11} | {4,-18} | {5,-18} ", x[0], x[1], x[2], x[3], x[4], stockavailability));
             }
@@ -82,13 +87,14 @@ ID       Store                       Product                  Quantity      Curr
                 if (Int32.TryParse(s, out int id))
                 {
                     success = c.ProcessStockRequest(id);
-                    Console.WriteLine(success ? "The operation was successful, the stock request has been processed and removed." : "The operation was a failure, you don't have enough stock, or you inserted an invalid ID.");
+                    Console.WriteLine(success ? "The operation was successful, the stock request has been processed and removed." : "The operation was a failure, you don't have enough stock, or You inserted an invalid ID.");
+                    success = true;
                 }
                 else 
                 {
                     if (!(s == "" || s == "\n"))
                     {
-                        Console.WriteLine("you inserted an invalid ID.");
+                        Console.WriteLine("You inserted an invalid ID.");
                     }
                     success = true;
                 }
@@ -129,7 +135,8 @@ ID    Product                   Current Stock");
                         }
                         catch (Exception)
                         {
-                            Console.WriteLine("This should never happen ever so this is a disaster");
+                            // This shouldn't occur
+                            Console.WriteLine("Unknown error, check that the DB is connected");
                         }
                                                    
                     }
@@ -149,7 +156,7 @@ ID    Product                   Current Stock");
                 {
                     if (!(s == "" || s == "\n"))
                     {
-                        Console.WriteLine("you inserted an invalid ID.");
+                        Console.WriteLine("You inserted an invalid ID.");
                     }
                     break;
                 }

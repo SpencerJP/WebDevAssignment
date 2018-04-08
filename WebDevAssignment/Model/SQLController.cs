@@ -4,6 +4,10 @@ using System.Data;
 
 namespace WebDevAssignment.Model
 {
+    /*
+     *  SQLController
+     *  Class implementing SQL support on the model side of the MVC pattern.
+     */
 
     class SQLController
     {
@@ -15,6 +19,7 @@ namespace WebDevAssignment.Model
         private string connectionString;
         private SqlConnection cnn;
 
+        /* constructs this object with the connection string */
         public SQLController()
         {
                 connectionString = "Data Source=" + SQLController.ServerAddress +
@@ -22,7 +27,11 @@ namespace WebDevAssignment.Model
                 ";Password=" + SQLController.Password;
         }
 
-        public DataTable ExecuteDataRequestReturnTable(string commandString)
+        /*
+         * @param commandString SQL command to execute
+         * @returns DataTable
+         */
+        public DataTable ExecuteDataRequest(string commandString)
         {
             using (cnn = new SqlConnection(connectionString))
             {
@@ -38,19 +47,10 @@ namespace WebDevAssignment.Model
             throw new Exception("Error while fetching data.");
         }
 
-        public SqlDataReader ExecuteDataRequestReturnReader(string commandString)
-        {
-            using (cnn = new SqlConnection(connectionString))
-            {
-                cnn.Open();
-
-                var command = cnn.CreateCommand();
-                command.CommandText = commandString;
-                return command.ExecuteReader();
-            }
-            throw new Exception("Error while fetching data.");
-        }
-
+        /*
+         * @param commandString SQL command to execute
+         * @returns integer of rows affected by the command
+         */
         public int ExecuteNonQueryRequest(string commandString)
         {
             using (cnn = new SqlConnection(connectionString))
